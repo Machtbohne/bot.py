@@ -14,44 +14,50 @@ player_dict = dict()
 async def on_ready():
     print("Bot ist bereit")
     
-import discord
-import asyncio
-import youtube_dl
-from discord.ext import commands
-from discord.utils import find
-import requests as rq
+@bot.event
+async def on_member_join(member):
+    with open("users.json", "r") as f:
+        users = json.load(f)
 
+        await update_data(users, member)
 
+        with open("users.json", "w") as f:
+            json.dump(users, f)
 
-def get_prefix(bot, msg):
-    """A callable Prefix for our bot. This could be edited to allow per server prefixes."""
+@bot.event
+async def on_message(message):
+    with open("users.json", "r") as f:
+        users = json.load(f)
 
-    # Notice how you can use spaces in prefixes. Try to keep them simple though.
-    prefixes = ['.']
+        if message.author.bot:
+            return
+        else:
+            await update_data(users, message.author)
+            number = random.randint(5,10)
+            await add_experience(users, message.author, number)
+            await level_up(users, message.author, message.channel)
 
-    return commands.when_mentioned_or(*prefixes)(bot, msg)
+        with open("users.json", "w") as f:
+            json.dump(users, f)
+    await bot.process_commands(message)
 
+async def update_data(users, user):
+    if not user.id in users:
+        users[user.id] = {}
+        users[user.id]["experience"] = 0
+        users[user.id]["level"] = 1
 
-bot = commands.Bot(command_prefix=get_prefix,description='A music bot fro discord Kurusaki')
-YOUTUBE_API='YOUR YOUTUBE API'
-bot.remove_command('help')
+async def add_experience(users, user, exp):
+    users[user.id]["experience"] += exp
 
-from discord import opus
-OPUS_LIBS = ['libopus-0.x86.dll', 'libopus-0.x64.dll','libopus-0.dll', 'libopus.so.0', 'libopus.0.dylib']
+async def level_up(users, user, channel):
+    experience = users[user.id]["experience"]
+    lvl_start = users[user.id]["level"]
+    lvl_end = int(experience ** (1/4))
 
-
-def load_opus_lib(opus_libs=OPUS_LIBS):
-    if opus.is_loaded():
-        return True
-
-    for opus_lib in opus_libs:
-            try:
-                opus.load_opus(opus_lib)
-                return
-            except OSError:
-                pass
-
-    raise RuntimeError('Could not load an opus lib. Tried %s' %(', '.join(opus_libs)))
+    if lvl_start < lvl_end:
+        await bot.send_message(channel, f":tada: Gratulation {user.mention}, du bist nun Level {lvl_end}!")
+        users[user.id]["level"] = lvl_end
 
 
 @client.command(pass_context=True)
