@@ -81,4 +81,4 @@ async def stop(ctx):
     del player_dict[server.id]
     
    
-client.run('BOT_TOKEN')
+client.run('NTUxNjczMTM2NTM4NDUxOTY5.D2LKpA.b6sWVT_QQHEPNeXpVdLxfOnngo8')
