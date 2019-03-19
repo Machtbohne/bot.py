@@ -1,38 +1,45 @@
-from discord.ext import commands
 import discord
-import asyncio
-import youtube_dl
-from discord.ext import commands
-from discord.utils import find
-import requests as rq
 
-client = commands.Bot(command_prefix="/")
-player_dict = dict()
+def read_token():
+    with open("token.txt", "r") as f:
+        lines = f.readlines()
+        return lines[0].strip()
+       
+token = read_token()
 
+client = discord.Client()
 
 @client.event
-async def on_ready():
-    print("Bot ist bereit")
-   
-@client.command(pass_context=True)
-async def play(ctx, url):
-    channel = ctx.message.author.voice.voice_channel
-    await client.join_voice_channel(channel)
-    server = ctx.message.server
-    voice = client.voice_client_in(server)
-    player = await voice.create_ytdl_player(url)
-    player_dict[server.id] = player
-    await client.send_message(ctx.message.channel, "Spiele `%s` ab" % player.title)
-    player.start()
+async def on_message(message):
+    if message.content.find("!bewerbung") != -1:
+        await message.channel.send("Hey Liebe Community,
 
 
-@client.command(pass_context=True)
-async def stop(ctx):
-    server = ctx.message.server
-    player = player_dict[server.id]
-    await client.send_message(ctx.message.channel, "Stoppe `%s` " % player.title)
-    player.stop()
-    del player_dict[server.id]
+Es ist endlich soweit hiermit Eröffne ich die Bewerbungphase Offiziell!
+
+Wir suchen:
+
+10 Supporter 
+
+2 Moderator GESCHLOSSEN
+
+3 Developer
+
+2 Designer
+
+3 Builder 
+
+Alle Bewerbungen Per Privat Nachricht mir schicken! Falls ihr euch als Moderator Beworben habt aber wir schon Moderator haben werdet ihr warscheinlich Supporter. 
+
+Nachdem ihr die Bewerbung geschickt habt werde ich euch nach Mindestens 7 tagen antworten ob ihr angenommen seit dann habt ihr erstmal ein Bewerbungsgespräch wo ihr paar Fragen beantworten müsst. 
+
+
+Viel Glück an alle!
+
+MFG GameSucht Administration")
+
+
     
-   
+    
+client.run(NTUxNjczMTM2NTM4NDUxOTY5.D3KoSQ.eALZ0su8KyHfdt7f0UVVFKJbaWc)
 client.run(str(os.environ.get('BOT_TOKEN')))
